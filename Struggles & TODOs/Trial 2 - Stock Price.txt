@@ -14,4 +14,4 @@ TODO:
 \
 2. just print rather than save into .csv\
 TODO: 
-\f1\b \cf2 writing code to save into .csv}
+\f1\b \cf2 writing code to save into .csv}          - unfinished
