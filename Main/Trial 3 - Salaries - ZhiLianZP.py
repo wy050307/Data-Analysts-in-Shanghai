@@ -14,7 +14,7 @@ salary_element = '<p.*>(\d+)K-(\d+)K</p>'
 salary = []
 
 # --2 公司名称
-company_element = '<a.* company_title">(w+)</a>'
+company_element = '<a.* company_title">(\w+)</a>'
 company = []
 # HTML:<a href="https://company.zhaopin.com/CZ138117190.htm" title="北京外企德科人力资源服务上海有限公司"
 # target="_blank" class="contentpile__content__wrapper__item__info__box__cname__title company_title"
@@ -54,6 +54,11 @@ while not disabled_button:
     temp = re.findall(salary_element, page.html.html)
     print(temp)
 
+    # 提取出公司名，并保存
+    company += re.findall(company_element, page.html.html)
+    temp2 = re.findall(company_element, page.html.html)
+    print(temp2)
+
     # 判断页面中下一页按钮还能不能点击
     disabled_button = re.findall(disabled_button_element, page.html.html)
 
@@ -63,7 +68,11 @@ while not disabled_button:
 
 # 写入 csv
 salary_type = []
+i = 0
 for s in salary:
+    # 提取公司名字
+    company_name = company[i]
+    print(company_name)
     # 求出每家公司的平均薪资，比如 [12, 15] 的平均值为 13
     salary_mean = (int(s[0]) + int(s[1])) / 2
     # 划定薪资范围
@@ -74,7 +83,8 @@ for s in salary:
     else:
         salary_type = 'middle_salary'
     # 写入 csv
-    csvwriter.writerow([salary_mean, salary_type])
+    csvwriter.writerow([company_name, salary_mean, salary_type])
+    i += 1
 
 """
 Ref: Python123 （2019-01-11）
