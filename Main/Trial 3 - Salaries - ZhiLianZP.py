@@ -13,12 +13,17 @@ salary_element = '<p.*>(\d+)K-(\d+)K</p>'
 salary = []
 
 # --2 公司名称
-#company_element = '<a.* company_title">(\w+)</a>'
 company_element = '<a.* company_title">(.*)</a>'
 company = []
 # HTML:<a href="https://company.zhaopin.com/CZ138117190.htm" title="北京外企德科人力资源服务上海有限公司"
 # target="_blank" class="contentpile__content__wrapper__item__info__box__cname__title company_title"
 # >北京外企德科人力资源服务上海有限公司</a>
+
+# --3 职位名称
+job_element = '<span title="(.*)" class=.*</span>'
+job = []
+# HTML: <span title="初级数据分析师" class="contentpile__content__wrapper__item__info__box__jobname__title"
+# >初级<span style="color: #FF5959;">数据分析师</span></span>
 
 # 设置停止符
 disabled_button_element = '<button.* disabled="disabled".*disable">下一页</button>'
@@ -54,10 +59,15 @@ while not disabled_button:
     temp = re.findall(salary_element, page.html.html)
     print(temp)
 
-    # 提取出公司名，并保存
+    # 提取出公司名，并保存为['彪洋科技(北京)有限公司', '上海晶樵网络信息...]
     company += re.findall(company_element, page.html.html)
     temp2 = re.findall(company_element, page.html.html)
     print(temp2)
+
+    # 提取职位名称
+    job += re.findall(job_element, page.html.html)
+    temp3 = re.findall(job_element, page.html.html)
+    print(temp3)
 
     # 判断页面中下一页按钮还能不能点击
     disabled_button = re.findall(disabled_button_element, page.html.html)
@@ -73,13 +83,14 @@ print('\nSaving into csv ...')
 # 新建 csv
 file = open('Trial 3 - Salaries.csv', 'w', newline='')
 csvwriter = csv.writer(file)
-csvwriter.writerow(['Company','Salary_Low', 'Salary_High', 'Salary Type'])
+csvwriter.writerow(['Company', 'Job_Title', 'Salary_Low', 'Salary_High', 'Salary Type'])
 # 写入 csv
 salary_type = []
 i = 0
 for s in salary:
     # 提取公司名字
     company_name = company[i]
+    job_title = job[i]
     salary_low = s[0]
     salary_high = s[1]
 
@@ -93,23 +104,11 @@ for s in salary:
     else:
         salary_type = 'middle_salary'
     # 写入 csv
-    csvwriter.writerow([company_name, salary_low, salary_high, salary_type])
+    csvwriter.writerow([company_name, job_title, salary_low, salary_high, salary_type])
     i += 1
 
 """
 Ref: Python123 （2019-01-11）
-# 求出每家公司的平均薪资，比如 [12, 15] 的平均值为 13
-salary = [(int(s[0]) + int(s[1])) / 2 for s in salary]
-# 划定薪资范围，便于展示，你也可以尝试其它展示方案
-low_salary, middle_salary, high_salary = [0, 0, 0]
-for s in salary:
-    if s <= 15:
-        low_salary += 1
-    elif s > 15 and s <= 30:
-        middle_salary += 1
-    else:
-        high_salary += 1
-
 
 # 作图
 # 调节图形大小，宽，高
