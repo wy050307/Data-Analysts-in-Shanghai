@@ -3,10 +3,9 @@ import re
 import csv
 # from matplotlib import pyplot as plt
 
-# 新建 csv
-file = open('Trial 3 - Salaries.csv', 'w', newline='')
-csvwriter = csv.writer(file)
-csvwriter.writerow(['Salary', 'Salary Type'])
+'''
+Web Crawl
+'''
 
 # 设置所要提取的元素
 # --1 工资
@@ -14,7 +13,8 @@ salary_element = '<p.*>(\d+)K-(\d+)K</p>'
 salary = []
 
 # --2 公司名称
-company_element = '<a.* company_title">(\w+)</a>'
+#company_element = '<a.* company_title">(\w+)</a>'
+company_element = '<a.* company_title">(.*)</a>'
 company = []
 # HTML:<a href="https://company.zhaopin.com/CZ138117190.htm" title="北京外企德科人力资源服务上海有限公司"
 # target="_blank" class="contentpile__content__wrapper__item__info__box__cname__title company_title"
@@ -40,7 +40,7 @@ p = 1
 """
 
 while not disabled_button:
-    print('正在爬取第' + str(p) + '页')
+    print('\n正在爬取第' + str(p) + '页')
     url = 'https://sou.zhaopin.com/?p=' + str(p) + '&jl=538&in=10900&kw=数据分析师&kt=3'
     # https://sou.zhaopin.com/?p=2&jl=538&kw=数据分析师&kt=3
 
@@ -65,14 +65,24 @@ while not disabled_button:
     p = p + 1
     session.close()
 
+'''
+写入 csv
+'''
+print('\nSaving into csv ...')
 
+# 新建 csv
+file = open('Trial 3 - Salaries.csv', 'w', newline='')
+csvwriter = csv.writer(file)
+csvwriter.writerow(['Company','Salary_Low', 'Salary_High', 'Salary Type'])
 # 写入 csv
 salary_type = []
 i = 0
 for s in salary:
     # 提取公司名字
     company_name = company[i]
-    print(company_name)
+    salary_low = s[0]
+    salary_high = s[1]
+
     # 求出每家公司的平均薪资，比如 [12, 15] 的平均值为 13
     salary_mean = (int(s[0]) + int(s[1])) / 2
     # 划定薪资范围
@@ -83,7 +93,7 @@ for s in salary:
     else:
         salary_type = 'middle_salary'
     # 写入 csv
-    csvwriter.writerow([company_name, salary_mean, salary_type])
+    csvwriter.writerow([company_name, salary_low, salary_high, salary_type])
     i += 1
 
 """
